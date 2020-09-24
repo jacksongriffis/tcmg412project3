@@ -5,9 +5,15 @@
 from urllib.request import urlretrieve
 from os import path
 
-#define log url and name
+#variables
 URL = 'https://s3.amazonaws.com/tcmg476/http_access_log'
 logfile = 'accesslog.log'
+total_requests = 0
+past_year_requests = 0
+unsuccessful_requests = 0
+redirected_requests = 0
+past_year = '/1995'
+
 
 #check if log file is already downloaded
 if path.exists('accesslog.log') == False:
@@ -18,16 +24,20 @@ if path.exists('accesslog.log') == False:
 
 #open the file, read each line, and count each line and date in past year
 fh = open(logfile)
-total_requests = 0
-past_year_requests = 0
-past_year = '/1995'
 for line in open(logfile):
     total_requests = total_requests + 1
     fh.readline()
     if past_year in line:
         past_year_requests = past_year_requests + 1
+    if '403 -' in line or '404 -' in line:
+        unsuccessful_requests = unsuccessful_requests + 1
+    if '302 -' in line:
+        redirected_requests = redirected_requests + 1
     
 #print the results        
 print()       
 print("Total requests in the last year: " + str(past_year_requests))
 print("Total requests in entire log: " + str(total_requests))
+print() 
+print("Unsuccessful requests: " + str(unsuccessful_requests))
+print("Redirected requests: " + str(redirected_requests))
